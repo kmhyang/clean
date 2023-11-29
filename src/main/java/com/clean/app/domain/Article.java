@@ -24,10 +24,15 @@ import java.util.Set;
         @Index(columnList = "createdBy")
 })
 @Entity
-public class Article extends AuditingFields{
+public class Article extends AuditingFields {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Setter
+    @JoinColumn(name = "userId")
+    @ManyToOne(optional = false)
+    private UserAccount userAccount; // 유저 정보 (ID)
 
     @Setter
     @Column(nullable = false)
@@ -39,12 +44,26 @@ public class Article extends AuditingFields{
 
     @Setter
     private String hashtag;
+//
+//    @ToString.Exclude // 댓글리스트 전체를 조회할 필요는 없으니 양방향 바인딩에서 끊으면 됨.
+//    @OrderBy("id")
+//    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+//    private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
 
-    @ToString.Exclude // 댓글리스트 전체를 조회할 필요는 없으니 양방향 바인딩에서 끊으면 됨.
-    @OrderBy("id")
+    @ToString.Exclude
+    @JoinTable(
+            name = "article_hashtag",
+            joinColumns = @JoinColumn(name = "articleId"),
+            inverseJoinColumns = @JoinColumn(name = "hashtagId")
+    )
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<Hashtag> hashtags = new LinkedHashSet<>();
+
+
+    @ToString.Exclude
+    @OrderBy("createdAt DESC")
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
-
 
 
     protected Article() {}  // 기본생성자 생성 필수

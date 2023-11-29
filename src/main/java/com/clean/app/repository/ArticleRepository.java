@@ -6,6 +6,8 @@ import com.clean.app.domain.QArticle;
 import com.clean.app.domain.QArticleComment;
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
@@ -18,6 +20,14 @@ public interface ArticleRepository extends
         QuerydslBinderCustomizer<QArticle>,
         QuerydslPredicateExecutor<Article>
 {
+
+    Page<Article> findByTitleContaining(String title, Pageable pageable);
+    Page<Article> findByContentContaining(String content, Pageable pageable);
+    Page<Article> findByUserAccount_UserIdContaining(String userId, Pageable pageable);
+    Page<Article> findByUserAccount_NicknameContaining(String nickname, Pageable pageable);
+    Page<Article> findByHashtag(String hashtag, Pageable pageable);
+
+    void deleteByIdAndUserAccount_UserId(Long articleId, String userid);
 
     //게시글 검색
     @Override
